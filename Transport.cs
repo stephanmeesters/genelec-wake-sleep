@@ -1,13 +1,12 @@
-﻿using HidApiAdapter;
+﻿using HidApi;
 
 namespace GenelecApp
 {
     internal class Transport : IDisposable
     {
-        public Transport(HidDevice hidDevice)
+        public Transport(DeviceInfo deviceInfo)
         {
-            HidDevice = hidDevice;
-            HidDevice.Connect();
+            HidDevice = deviceInfo.ConnectToDevice();
         }
 
         public void Send(GNetMessage message)
@@ -15,18 +14,25 @@ namespace GenelecApp
             var data = Escape(message.Message);
 
             var payload = new List<byte>();
+            payload.Add(0x0);
             payload.Add((byte)(0x80 + data.Count));
             payload.AddRange(data);
 #if DEBUG
             Console.WriteLine($"Send command: {BitConverter.ToString(payload.ToArray())}");
 #endif
-            payload.AddRange(Enumerable.Repeat((byte)0x0, 64 - payload.Count));
+            payload.AddRange(Enumerable.Repeat((byte)0x0, 65 - payload.Count));
+
+            Console.WriteLine($"Send command: {BitConverter.ToString(payload.AsReadOnly().ToArray())}");
+            
 
             Thread.Sleep(3);
-            var result = HidDevice.Write(payload.ToArray());
-            if(result == -1)
+            try
             {
-                Console.WriteLine("Write error occurred.");
+                HidDevice.Write(payload.AsReadOnly().ToArray());
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Write error occurred: {ex}");
             }
             
         }
@@ -69,9 +75,9 @@ namespace GenelecApp
 
         public void Dispose()
         {
-            HidDevice.Disconnect();
+            HidDevice.Dispose();
         }
 
-        public HidDevice HidDevice { get; }
+        public Device HidDevice { get; }
     }
 }

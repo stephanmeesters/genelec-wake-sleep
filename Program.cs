@@ -1,4 +1,4 @@
-﻿using HidApiAdapter;
+﻿using HidApi;
 using System.Diagnostics;
 
 namespace GenelecApp
@@ -43,7 +43,7 @@ namespace GenelecApp
             }
         }
 
-        static void WakeUp(HidDevice device)
+        static void WakeUp(DeviceInfo device)
         {
             using var transporter = new Transport(device);
 
@@ -59,7 +59,7 @@ namespace GenelecApp
             }
         }
 
-        static void Shutdown(HidDevice device)
+        static void Shutdown(DeviceInfo device)
         {
             using var transporter = new Transport(device);
 
@@ -75,24 +75,14 @@ namespace GenelecApp
             }
         }
 
-        static HidDevice? FindGLMDevice()
+        static DeviceInfo? FindGLMDevice()
         {
-            var devices = HidDeviceManager.GetManager().SearchDevices(0, 0);
-            if (devices.Any())
+            foreach (var deviceInfo in Hid.Enumerate())
             {
-                foreach (var device in devices)
-                {
-                    device.Connect();
-
-                    var vid = device.VendorId;
-                    var pid = device.ProductId;
-
-                    device.Disconnect();
-
-                    if (vid == Constants.GENELEC_GLM_VID &&
-                        pid == Constants.GENELEC_GLM_PID)
-                        return device;
-                }
+                using var device = deviceInfo.ConnectToDevice();
+                if (device.GetDeviceInfo().VendorId == Constants.GENELEC_GLM_VID &&
+                    device.GetDeviceInfo().ProductId == Constants.GENELEC_GLM_PID)
+                    return deviceInfo;
             }
 
             return null;
