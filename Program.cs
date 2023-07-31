@@ -1,6 +1,7 @@
 ﻿using HidApiAdapter;
+using System.Diagnostics;
 
-namespace GenelecApp // Note: actual namespace depends on the project name.
+namespace GenelecApp
 {
     internal class Program
     {
@@ -9,28 +10,16 @@ namespace GenelecApp // Note: actual namespace depends on the project name.
             WAKE = 0,
             SLEEP = 1
         }
+
         static void Main(string[] args)
         {
-            if (args.Length == 0)
+            if (args.Any() && Enum.TryParse(args[0], true, out RunAction action))
             {
-                Console.WriteLine("Please provide an integer argument 0 or 1 (WAKE or SLEEP).");
-                return;
-            }
-
-            if (Enum.TryParse(args[0], out RunAction action))
-            {
-                if (Enum.IsDefined(typeof(RunAction), action))
-                {
-                    RunCommand(action);
-                }
-                else
-                {
-                    Console.WriteLine("Invalid input. The argument should be 0 or 1 (WAKE or SLEEP).");
-                }
+                RunCommand(action);
             }
             else
             {
-                Console.WriteLine("Invalid input. The argument should be 0 or 1 (WAKE or SLEEP).");
+                Console.WriteLine($"Usage: {ExecutableName} [sleep, wake]");
             }
         }
 
@@ -65,10 +54,7 @@ namespace GenelecApp // Note: actual namespace depends on the project name.
             foreach(var data in dataQueue)
             {
                 var msg = new GNetMessage(Constants.GNET_BROADCAST_ADDR, Constants.CID_WAKEUP, data);
-                // Send broadcast message twice
-                Thread.Sleep(30);
                 transporter.Send(msg);
-                Thread.Sleep(30);
                 transporter.Send(msg);
             }
         }
@@ -84,10 +70,7 @@ namespace GenelecApp // Note: actual namespace depends on the project name.
             foreach (var data in dataQueue)
             {
                 var msg = new GNetMessage(Constants.GNET_BROADCAST_ADDR, Constants.CID_WAKEUP, data);
-                // Send broadcast message twice
-                Thread.Sleep(30);
                 transporter.Send(msg);
-                Thread.Sleep(30);
                 transporter.Send(msg);
             }
         }
@@ -114,5 +97,7 @@ namespace GenelecApp // Note: actual namespace depends on the project name.
 
             return null;
         }
+
+        static string ExecutableName => Path.GetFileName(Process.GetCurrentProcess()?.MainModule?.FileName) ?? "GenelecApp.exe";
     }
 }

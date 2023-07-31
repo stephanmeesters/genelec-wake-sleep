@@ -17,13 +17,12 @@ namespace GenelecApp
             var payload = new List<byte>();
             payload.Add((byte)(0x80 + data.Count));
             payload.AddRange(data);
-
 #if DEBUG
             Console.WriteLine($"Send command: {BitConverter.ToString(payload.ToArray())}");
 #endif
-
             payload.AddRange(Enumerable.Repeat((byte)0x0, 64 - payload.Count));
 
+            Thread.Sleep(3);
             var result = HidDevice.Write(payload.ToArray());
             if(result == -1)
             {

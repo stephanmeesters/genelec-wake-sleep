@@ -47,6 +47,7 @@
             Message.AddRange(CalculateCRC16GSM(Message));
             Message.Add(Constants.GNET_TERM);
         }
+
         public GNetMessage(byte address, byte command, byte[] data)
         {
             Message.Add(address);
@@ -55,6 +56,7 @@
             Message.AddRange(CalculateCRC16GSM(Message));
             Message.Add(Constants.GNET_TERM);
         }
+
         private static byte[] CalculateCRC16GSM(List<byte> data)
         {
             ushort crc = 0x0000;
