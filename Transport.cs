@@ -25,7 +25,7 @@ namespace GenelecApp
             Console.WriteLine($"Send command: {BitConverter.ToString(payload.AsReadOnly().ToArray())}");
             
 
-            Thread.Sleep(3);
+            Thread.Sleep(30);
             try
             {
                 HidDevice.Write(payload.AsReadOnly().ToArray());
