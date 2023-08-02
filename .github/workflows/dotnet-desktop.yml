@@ -3,7 +3,7 @@ name: .NET Desktop CI
 on:
   push:
     branches:
-      - main # Replace 'main' with your desired branch name
+      - main
 
 env:
   WINDOWS_ZIP: GenelecWakeSleep-windows-v1.0.${{ github.run_number }}.zip
@@ -13,7 +13,7 @@ env:
 jobs:
   build_and_release:
     permissions: write-all
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     
     steps:
     - name: Checkout code
@@ -22,7 +22,7 @@ jobs:
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 6.0.x # Replace '6.0.x' with the desired .NET SDK version
+        dotnet-version: 6.0.x
 
     - name: Download hidapi-win.zip
       run: |
@@ -31,8 +31,7 @@ jobs:
 
     - name: Copy hidapi.dll to src directory
       run: |
-        mkdir -p GenelecApp/x64
-        cp hidapi/x64/hidapi.dll ./
+        cp hidapi/x64/hidapi.dll ./hidapi.dll
 
     - name: Restore dependencies
       run: dotnet restore GenelecApp.sln
