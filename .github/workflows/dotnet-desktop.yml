@@ -8,12 +8,13 @@ on:
 env:
   WINDOWS_ZIP: GenelecWakeSleep-windows-v1.0.${{ github.run_number }}.zip
   LINUX_ZIP: GenelecWakeSleep-linux-v1.0.${{ github.run_number }}.zip
-  OSX_ZIP: GenelecWakeSleep-osx-v1.0.${{ github.run_number }}.zip
+  OSX_INTEL_ZIP: GenelecWakeSleep-osx-intel-v1.0.${{ github.run_number }}.zip
+  OSX_ARM_ZIP: GenelecWakeSleep-osx-arm-v1.0.${{ github.run_number }}.zip
 
 jobs:
   build_and_release:
     permissions: write-all
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     
     steps:
     - name: Checkout code
@@ -24,15 +25,6 @@ jobs:
       with:
         dotnet-version: 6.0.x
 
-    - name: Download hidapi-win.zip
-      run: |
-        curl -LO https://github.com/libusb/hidapi/releases/download/hidapi-0.14.0/hidapi-win.zip
-        unzip hidapi-win.zip -d hidapi
-
-    - name: Copy hidapi.dll to src directory
-      run: |
-        cp hidapi/x64/hidapi.dll ./hidapi.dll
-
     - name: Restore dependencies
       run: dotnet restore GenelecApp.sln
 
@@ -42,22 +34,25 @@ jobs:
     - name: Build for Linux
       run: dotnet publish -c Release -r linux-x64 -p:PublishSingleFile=true --self-contained true /p:DebugType=None /p:DebugSymbols=false -o ./binaries/linux-x64 GenelecApp.sln
 
-    - name: Build for macOS
+    - name: Build for macOS (Intel)
       run: dotnet publish -c Release -r osx-x64 -p:PublishSingleFile=true --self-contained true /p:DebugType=None /p:DebugSymbols=false -o ./binaries/osx-x64 GenelecApp.sln
 
-    - name: Exclude unwanted files
+    - name: Build for macOS (ARM)
+      run: dotnet publish -c Release -r osx-arm -p:PublishSingleFile=true --self-contained true /p:DebugType=None /p:DebugSymbols=false -o ./binaries/osx-arm GenelecApp.sln
+
+    - name: Set permissions
       run: |
-        Remove-Item -Path ./binaries/linux-x64/*.bat
-        Remove-Item -Path ./binaries/linux-x64/*.dll
-        Remove-Item -Path ./binaries/osx-x64/*.bat
-        Remove-Item -Path ./binaries/osx-x64/*.dll
+        chmod +x ./binaries/linux-x64/GenelecApp
+        chmod +x ./binaries/linux-x64/libhidapi-hidraw.so.0
+        chmod +x ./binaries/osx-x64/GenelecApp
+        chmod +x ./binaries/osx-arm/GenelecApp
         
     - name: Archive binaries
       run: |
-        cd ./binaries
-        Compress-Archive -Path win-x64/* -Destination ${{ env.WINDOWS_ZIP }}
-        Compress-Archive -Path linux-x64/* -Destination ${{ env.LINUX_ZIP }}
-        Compress-Archive -Path osx-x64/* -Destination ${{ env.OSX_ZIP }}
+        zip -FSrj ./binaries/${{ env.WINDOWS_ZIP }} ./binaries/win-x64/*
+        zip -FSrj ./binaries/${{ env.LINUX_ZIP }} ./binaries/linux-x64/*
+        zip -FSrj ./binaries/${{ env.OSX_INTEL_ZIP }} ./binaries/osx-x64/*
+        zip -FSrj ./binaries/${{ env.OSX_ARM_ZIP }} ./binaries/osx-arm/*
 
     - name: Create Release
       id: create_release
@@ -90,12 +85,21 @@ jobs:
         asset_name: ${{ env.LINUX_ZIP }}
         asset_content_type: application/zip
 
-    - name: Attach macOS binaries to Release
+    - name: Attach macOS (Intel) binaries to Release
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./binaries/${{ env.OSX_ZIP }}
-        asset_name: ${{ env.OSX_ZIP }}
+        asset_path: ./binaries/${{ env.OSX_INTEL_ZIP }}
+        asset_name: ${{ env.OSX_INTEL_ZIP }}
+
+    - name: Attach macOS (ARM) binaries to Release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./binaries/${{ env.OSX_ARM_ZIP }}
+        asset_name: ${{ env.OSX_ARM_ZIP }}
         asset_content_type: application/zip
