@@ -38,7 +38,7 @@ jobs:
       run: dotnet publish -c Release -r osx-x64 -p:PublishSingleFile=true --self-contained true /p:DebugType=None /p:DebugSymbols=false -o ./binaries/osx-x64 GenelecApp.sln
 
     - name: Build for macOS (ARM)
-      run: dotnet publish -c Release -r osx-arm -p:PublishSingleFile=true --self-contained true /p:DebugType=None /p:DebugSymbols=false -o ./binaries/osx-arm GenelecApp.sln
+      run: dotnet publish -c Release -r osx-arm64 -p:PublishSingleFile=true --self-contained true /p:DebugType=None /p:DebugSymbols=false -o ./binaries/osx-arm GenelecApp.sln
 
     - name: Set permissions
       run: |
