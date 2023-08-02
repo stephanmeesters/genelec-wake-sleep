@@ -24,6 +24,16 @@ jobs:
       with:
         dotnet-version: 6.0.x # Replace '6.0.x' with the desired .NET SDK version
 
+    - name: Download hidapi-win.zip
+      run: |
+        curl -LO https://github.com/libusb/hidapi/releases/download/hidapi-0.14.0/hidapi-win.zip
+        unzip hidapi-win.zip -d hidapi
+
+    - name: Copy hidapi.dll to src directory
+      run: |
+        mkdir -p GenelecApp/x64
+        cp hidapi/x64/hidapi.dll ./
+
     - name: Restore dependencies
       run: dotnet restore GenelecApp.sln
 
@@ -60,7 +70,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: v${{ github.run_number }} # Use auto-incremented version based on the run number
+        tag_name: v1.0.${{ github.run_number }} # Use auto-incremented version based on the run number
         release_name: Release v1.0.${{ github.run_number }}
         draft: false
         prerelease: false
