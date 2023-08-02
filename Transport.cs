@@ -6,7 +6,15 @@ namespace GenelecApp
     {
         public Transport(DeviceInfo deviceInfo)
         {
-            HidDevice = deviceInfo.ConnectToDevice();
+            try
+            {
+                HidDevice = deviceInfo.ConnectToDevice();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error when connecting to USB device: {ex.Message}");
+                throw;
+            }
         }
 
         public void Send(GNetMessage message)
@@ -32,7 +40,7 @@ namespace GenelecApp
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Write error occurred: {ex}");
+                Console.WriteLine($"Error when writing to USB device: {ex.Message}");
             }
             
         }
