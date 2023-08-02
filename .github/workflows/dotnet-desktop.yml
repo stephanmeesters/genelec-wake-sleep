@@ -1,0 +1,77 @@
+name: .NET Desktop CI
+
+on:
+  push:
+    branches:
+      - main # Replace 'main' with your desired branch name
+
+jobs:
+  build_and_release:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.0.x # Replace '6.0.x' with the desired .NET SDK version
+
+    - name: Restore dependencies
+      run: dotnet restore GenelecApp.sln
+
+    - name: Build for Windows
+      run: dotnet publish -c Release -r win-x64 --self-contained true --publish-single-file -o ./binaries/win-x64 GenelecApp.sln
+
+    - name: Build for Linux
+      run: dotnet publish -c Release -r linux-x64 --self-contained true --publish-single-file -o ./binaries/linux-x64 GenelecApp.sln
+
+    - name: Build for macOS
+      run: dotnet publish -c Release -r osx-x64 --self-contained true --publish-single-file -o ./binaries/osx-x64 GenelecApp.sln
+
+    - name: Exclude unwanted files
+      run: |
+        cd ./binaries/win-x64
+        rm -rf *.bat *.dll *.pdb
+
+        cd ../linux-x64
+        rm -rf *.bat *.dll *.pdb
+
+        cd ../osx-x64
+        rm -rf *.bat *.dll *.pdb
+
+    - name: Archive binaries
+      run: |
+        cd ./binaries
+        zip -r win-x64.zip win-x64
+        zip -r linux-x64.zip linux-x64
+        zip -r osx-x64.zip osx-x64
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ github.run_number }} # Use auto-incremented version based on the run number
+        release_name: Release v${{ github.run_number }}
+        draft: false
+        prerelease: false
+
+    - name: Upload Windows binaries
+      uses: actions/upload-artifact@v2
+      with:
+        name: win-x64
+        path: ./binaries/win-x64.zip
+
+    - name: Upload Linux binaries
+      uses: actions/upload-artifact@v2
+      with:
+        name: linux-x64
+        path: ./binaries/linux-x64.zip
+
+    - name: Upload macOS binaries
+      uses: actions/upload-artifact@v2
+      with:
+        name: osx-x64
+        path: ./binaries/osx-x64.zip
