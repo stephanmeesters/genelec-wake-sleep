@@ -48,9 +48,9 @@ jobs:
     - name: Archive binaries
       run: |
         cd ./binaries
-        zip -r ${{ env.WINDOWS_ZIP }} win-x64/*
-        zip -r ${{ env.LINUX_ZIP }} linux-x64/*
-        zip -r ${{ env.OSX_ZIP }} osx-x64/*
+        Compress-Archive -Path win-x64/* -Destination ${{ env.WINDOWS_ZIP }}
+        Compress-Archive -Path linux-x64/* -Destination ${{ env.LINUX_ZIP }}
+        Compress-Archive -Path osx-x64/* -Destination ${{ env.OSX_ZIP }}
 
     - name: Create Release
       id: create_release
