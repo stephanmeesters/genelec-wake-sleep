@@ -38,24 +38,13 @@ jobs:
       run: dotnet restore GenelecApp.sln
 
     - name: Build for Windows
-      run: dotnet publish -c Release -r win-x64 -p:PublishSingleFile=true --self-contained true -o ./binaries/win-x64 GenelecApp.sln
+      run: dotnet publish -c Release -r win-x64 -p:PublishSingleFile=true --self-contained true /p:DebugType=None /p:DebugSymbols=false -o ./binaries/win-x64 GenelecApp.sln
 
     - name: Build for Linux
-      run: dotnet publish -c Release -r linux-x64 -p:PublishSingleFile=true --self-contained true -o ./binaries/linux-x64 GenelecApp.sln
+      run: dotnet publish -c Release -r linux-x64 -p:PublishSingleFile=true --self-contained true /p:DebugType=None /p:DebugSymbols=false -o ./binaries/linux-x64 GenelecApp.sln
 
     - name: Build for macOS
-      run: dotnet publish -c Release -r osx-x64 -p:PublishSingleFile=true --self-contained true -o ./binaries/osx-x64 GenelecApp.sln
-
-    - name: Exclude unwanted files
-      run: |
-        cd ./binaries/win-x64
-        rm -rf *.pdb
-
-        cd ../linux-x64
-        rm -rf *.bat *.dll *.pdb
-
-        cd ../osx-x64
-        rm -rf *.bat *.dll *.pdb
+      run: dotnet publish -c Release -r osx-x64 -p:PublishSingleFile=true --self-contained true /p:DebugType=None /p:DebugSymbols=false -o ./binaries/osx-x64 GenelecApp.sln
 
     - name: Archive binaries
       run: |
