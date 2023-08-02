@@ -45,6 +45,13 @@ jobs:
     - name: Build for macOS
       run: dotnet publish -c Release -r osx-x64 -p:PublishSingleFile=true --self-contained true /p:DebugType=None /p:DebugSymbols=false -o ./binaries/osx-x64 GenelecApp.sln
 
+    - name: Exclude unwanted files
+      run: |
+        Remove-Item -Path ./binaries/linux-x64/*.bat
+        Remove-Item -Path ./binaries/linux-x64/*.dll
+        Remove-Item -Path ./binaries/osx-x64/*.bat
+        Remove-Item -Path ./binaries/osx-x64/*.dll
+        
     - name: Archive binaries
       run: |
         cd ./binaries
