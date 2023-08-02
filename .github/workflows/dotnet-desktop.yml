@@ -60,9 +60,9 @@ jobs:
     - name: Archive binaries
       run: |
         cd ./binaries
-        zip -r -D ${{ env.WINDOWS_ZIP }} win-x64
-        zip -r -D ${{ env.LINUX_ZIP }} linux-x64
-        zip -r -D ${{ env.OSX_ZIP }} osx-x64
+        zip -r ${{ env.WINDOWS_ZIP }} win-x64/*
+        zip -r ${{ env.LINUX_ZIP }} linux-x64/*
+        zip -r ${{ env.OSX_ZIP }} osx-x64/*
 
     - name: Create Release
       id: create_release
