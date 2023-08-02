@@ -19,9 +19,10 @@ GenelecApp.exe sleep
 ```
 
 ### Mac
-Install HIDAPI using [Brew](https://brew.sh/):
+Install HIDAPI using [Brew](https://brew.sh/) and set permissions:
 ```
 brew install hidapi
+chmod +x GenelecApp
 ```
 
 Run the command for wake
@@ -35,9 +36,10 @@ GenelecApp sleep
 ```
 
 ### Linux
-Install HIDAPI using apt:
+Install HIDAPI using apt and set permissions:
 ```
 sudo apt-get install libhidapi-dev
+chmod +x GenelecApp
 ```
 
 Run the command for wake

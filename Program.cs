@@ -89,7 +89,7 @@ namespace GenelecApp
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error when discovering USB devices: {ex.Message}");
+                Console.WriteLine($"Error when discovering USB devices: {ex}");
             }
 
             return null;

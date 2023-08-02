@@ -12,7 +12,7 @@ namespace GenelecApp
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error when connecting to USB device: {ex.Message}");
+                Console.WriteLine($"Error when connecting to USB device: {ex}");
                 throw;
             }
         }
@@ -40,7 +40,7 @@ namespace GenelecApp
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error when writing to USB device: {ex.Message}");
+                Console.WriteLine($"Error when writing to USB device: {ex}");
             }
             
         }
