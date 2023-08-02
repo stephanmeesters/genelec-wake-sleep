@@ -30,9 +30,6 @@ namespace GenelecApp
 #endif
             payload.AddRange(Enumerable.Repeat((byte)0x0, 65 - payload.Count));
 
-            Console.WriteLine($"Send command: {BitConverter.ToString(payload.AsReadOnly().ToArray())}");
-            
-
             Thread.Sleep(30);
             try
             {

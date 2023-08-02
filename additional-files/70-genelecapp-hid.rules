@@ -1,0 +1,19 @@
+# HIDAPI/hidraw
+KERNEL=="hidraw*", ATTRS{idVendor}=="1781", ATTRS{idProduct}=="0e39", TAG+="uaccess"
+
+# Once done, drop thus file it into
+# /etc/udev/rules.d/.
+
+# Then, replug your device or run:
+# sudo udevadm control --reload-rules && sudo udevadm trigger
+
+# Note that the hexadecimal values for VID and PID are case sensitive and
+# must be lower case.
+
+# TAG+="uaccess" only gives permission to physically present users, which
+# is appropriate in most scenarios. If you require access to the device
+# from a remote session (e.g. over SSH), add
+# GROUP="plugdev", MODE="660"
+# to the end of the udev rule lines, add your user to the plugdev group with:
+# usermod -aG plugdev USERNAME
+# then log out and log back in (or restart the system).

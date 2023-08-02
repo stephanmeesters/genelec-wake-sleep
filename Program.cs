@@ -77,19 +77,26 @@ namespace GenelecApp
 
         static DeviceInfo? FindGLMDevice()
         {
-            try
+            Exception? exception = null;
+            
+            foreach (var deviceInfo in Hid.Enumerate())
             {
-                foreach (var deviceInfo in Hid.Enumerate())
+                try
                 {
                     using var device = deviceInfo.ConnectToDevice();
                     if (device.GetDeviceInfo().VendorId == Constants.GENELEC_GLM_VID &&
                         device.GetDeviceInfo().ProductId == Constants.GENELEC_GLM_PID)
                         return deviceInfo;
                 }
+                catch (Exception ex)
+                {
+                    exception = ex;
+                }
             }
-            catch (Exception ex)
+
+            if(exception != null)
             {
-                Console.WriteLine($"Error when discovering USB devices: {ex}");
+                Console.WriteLine($"Error when discovering USB devices: {exception}");
             }
 
             return null;

@@ -11,16 +11,20 @@
     <PackageReference Include="HidApi.Net" Version="0.4.0" />
   </ItemGroup>
 
-  <ItemGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
-    <None Update="sleep-genelec.bat">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="wake-genelec.bat">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="hidapi.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+  <ItemGroup>
+    <WinFiles Include="additional-files/wake-genelec.bat" />
+    <WinFiles Include="additional-files/sleep-genelec.bat" />
+    <WinFiles Include="additional-files/hidapi.dll" />
+    <LinuxFiles Include="additional-files/libhidapi-hidraw.so.0" />
+
   </ItemGroup>
+
+  <Target Name="CopyWindows" BeforeTargets="Build" Condition="'$(RuntimeIdentifier)'=='win-x64'">
+    <Copy SourceFiles="@(WinFiles)" DestinationFolder="$(PublishDir)" SkipUnchangedFiles="true" />
+  </Target>
+
+  <Target Name="CopyLinux" BeforeTargets="Build" Condition="'$(RuntimeIdentifier)'=='linux-x64'">
+    <Copy SourceFiles="@(LinuxFiles)" DestinationFolder="$(PublishDir)" SkipUnchangedFiles="true" />
+  </Target>
 
 </Project>

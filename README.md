@@ -1,7 +1,7 @@
 # Genelec Wake Sleep
-The Intelligent Signal Sensing (ISS) feature of Genelec monitors does not always work well because the audio source sends a digital clock signal that prevents sleep. This app can be used to trigger wake or sleep of all connected Genelec devices.
+The Intelligent Signal Sensing (ISS) feature of Genelec monitors does not always work well because the audio source sends a digital clock signal that prevents sleep. This app can be used to trigger wake or sleep of all connected Genelec SAM monitors through the GLM network adapter.
 
-Based on reverse engineering work from https://github.com/markbergsma/genlc/tree/master
+Based on reverse engineering work by Mark Bergsma https://github.com/markbergsma/genlc
 
 ## Usage
 
@@ -18,36 +18,44 @@ and sleep:
 GenelecApp.exe sleep
 ```
 
-### Mac
-Install HIDAPI using [Brew](https://brew.sh/) and set permissions:
+### Linux (Debian)
+A recent version of HIDAPI is required (tested using 0.14.0). Use the included .so file or compile the library from https://github.com/libusb/hidapi
+
+Run the command for wake:
+```
+sudo ./GenelecApp wake
+```
+
+and sleep:
+```
+sudo ./GenelecApp sleep
+```
+
+To be able to access the USB device without sudo, install the included HID rule:
+```
+cp 70-genelecapp-hid.rules /etc/udev/rules.d/
+sudo udevadm control --reload-rules && sudo udevadm trigger
+```
+
+### Mac (Intel/Apple Silicon) -- untested
+Install HIDAPI using [Brew](https://brew.sh/):
 ```
 brew install hidapi
-chmod +x GenelecApp
 ```
 
-Run the command for wake
+Run the command for wake:
 ```
-GenelecApp wake
-```
-
-and sleep:
-```
-GenelecApp sleep
-```
-
-### Linux
-Install HIDAPI using apt and set permissions:
-```
-sudo apt-get install libhidapi-dev
-chmod +x GenelecApp
-```
-
-Run the command for wake
-```
-GenelecApp wake
+sudo ./GenelecApp wake
 ```
 
 and sleep:
 ```
-GenelecApp sleep
+sudo ./GenelecApp sleep
 ```
+
+For Apple Silicon devices it may be needed to codesign the executable:
+```
+codesign -s - ./GenelecApp
+```
+
+To run without sudo, try adding GenelecApp to "Enable access for assistive devices" in "System Preferences > Security & Privacy > Privacy > Accessibility".
