@@ -60,8 +60,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: v1.0.${{ github.run_number }} # Use auto-incremented version based on the run number
-        release_name: Release v1.0.${{ github.run_number }}
+        tag_name: v1.0.${{ github.run_number-22 }}
+        release_name: Release v1.0.${{ github.run_number-22 }}
         draft: false
         prerelease: false
 
