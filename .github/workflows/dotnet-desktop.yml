@@ -46,11 +46,6 @@ jobs:
         chmod +x ./binaries/linux-x64/libhidapi-hidraw.so.0
         chmod +x ./binaries/osx-x64/GenelecApp
         chmod +x ./binaries/osx-arm/GenelecApp
-
-    - name: Codesign
-      run: |
-        codesign -s - ./binaries/osx-x64/GenelecApp
-        codesign -s - ./binaries/osx-arm/GenelecApp
         
     - name: Archive binaries
       run: |
