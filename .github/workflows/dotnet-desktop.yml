@@ -17,6 +17,10 @@ jobs:
     runs-on: macos-12
     
     steps:
+    - name: Version number
+      run: |
+        echo "VERSION_NUMBER=$((GITHUB_RUN_NUMBER-23))" >> $GITHUB_ENV
+        
     - name: Checkout code
       uses: actions/checkout@v2
 
@@ -60,8 +64,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: v1.0.${{ github.run_number-22 }}
-        release_name: Release v1.0.${{ github.run_number-22 }}
+        tag_name: v1.0.${{ env.VERSION_NUMBER }}
+        release_name: Release v1.0.${{ env.VERSION_NUMBER }}
         draft: false
         prerelease: false
 
