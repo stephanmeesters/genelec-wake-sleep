@@ -53,9 +53,4 @@ and sleep:
 sudo ./GenelecApp sleep
 ```
 
-For Apple Silicon devices it may be needed to codesign the executable:
-```
-codesign -s - ./GenelecApp
-```
-
 To run without sudo, try adding GenelecApp to "Enable access for assistive devices" in "System Preferences > Security & Privacy > Privacy > Accessibility".
