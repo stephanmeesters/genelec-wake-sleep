@@ -19,7 +19,7 @@ Small Rust application to manage Genelec speaker power states via systemd and ud
 %autosetup
 
 %build
-rustup run stable cargo build --release
+rustup toolchain install stable-x86_64-unknown-linux-gnu && rustup run stable cargo build --release
 
 %install
 # Install binary
