@@ -40,21 +40,21 @@ jobs:
       # - name: Replace version in RPM spec
       #   run: sed -Ei 's/(^Version:[[:space:]]*).*/\1${{ github.ref_name }}/' ${{ vars.PKG_NAME }}.spec
       #
-      - name: Setup Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          target: x86_64-unknown-linux-gnu
-          default: true
-
-      - name: Install HIDAPI Dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libhidapi-dev libudev-dev
+      # - name: Setup Rust
+      #   uses: actions-rs/toolchain@v1
+      #   with:
+      #     toolchain: stable
+      #     target: x86_64-unknown-linux-gnu
+      #     default: true
+      #
+      # - name: Install HIDAPI Dependencies
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install -y libhidapi-dev libudev-dev
 
       - name: Build RPM
         id: rpm
-        uses: naveenrajm7/rpmbuild@master
+        uses: naveenrajm7/rpmbuild@centos8
         with:
           spec_file: ${{ vars.PKG_NAME }}.spec
 
