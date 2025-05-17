@@ -37,8 +37,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Replace version in RPM spec
-        run: sed -Ei 's/(^Version:[[:space:]]*).*/\1${{ github.ref_name }}/' ${{ vars.PKG_NAME }}.spec
+      # - name: Replace version in RPM spec
+      #   run: sed -Ei 's/(^Version:[[:space:]]*).*/\1${{ github.ref_name }}/' ${{ vars.PKG_NAME }}.spec
+      #
+      - name: Install HIDAPI Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libhidapi-dev libudev-dev
 
       - name: Build RPM
         id: rpm
