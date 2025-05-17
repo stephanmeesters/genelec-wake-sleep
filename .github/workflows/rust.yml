@@ -1,8 +1,10 @@
 name: Build Linux Packages
+
 on:
   push:
     branches:
       - workflow-test
+
 env:
   DIST: el7
   ARCH: noarch
@@ -13,18 +15,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Replace version in RPM spec so correct source is downloaded when building RPM
-        run: sed -Ei 's/(^Version:[[:space:]]*).*/\1${{github.ref_name}}/' ${{ vars.PKG_NAME }}.spec
+      - name: Replace version in RPM spec
+        run: sed -Ei 's/(^Version:[[:space:]]*).*/\1${{ github.ref_name }}/' ${{ vars.PKG_NAME }}.spec
 
       - name: Create source archive
-        run: tar -cvf ${{ vars.PKG_NAME }}-${{ github.ref_name }}.tar.gz *
+        run: tar -czvf ${{ vars.PKG_NAME }}-${{ github.ref_name }}.tar.gz *
 
-      - name: Upload source archive as artifact
-        uses: actions/upload-artifact@v3
+      - name: Upload source archive
+        uses: actions/upload-artifact@v4
         with:
-          name: ${{ vars.PKG_NAME }}-${{ github.ref_name }}.tar.gz
+          name: source-archive
           path: ${{ vars.PKG_NAME }}-${{ github.ref_name }}.tar.gz
 
   build_rpm:
@@ -33,21 +35,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Replace version in RPM spec so correct source is downloaded when building RPM
-        run: sed -Ei 's/(^Version:[[:space:]]*).*/\1${{github.ref_name}}/' ${{ vars.PKG_NAME }}.spec
+      - name: Replace version in RPM spec
+        run: sed -Ei 's/(^Version:[[:space:]]*).*/\1${{ github.ref_name }}/' ${{ vars.PKG_NAME }}.spec
 
-      - name: Run rpmbuild on RPM spec to produce package
+      - name: Build RPM
         id: rpm
         uses: naveenrajm7/rpmbuild@master
         with:
           spec_file: ${{ vars.PKG_NAME }}.spec
 
-      - name: Upload .rpm package as artifact
-        uses: actions/upload-artifact@v3
+      - name: Upload RPM
+        uses: actions/upload-artifact@v4
         with:
-          name: ${{ vars.PKG_NAME }}-${{ github.ref_name }}-1.${{ env.DIST }}.${{ env.ARCH }}.rpm
+          name: rpm-package
           path: rpmbuild/RPMS/${{ env.ARCH }}/*.rpm
 
   build_deb:
@@ -55,35 +57,55 @@ jobs:
     needs: build_rpm
     runs-on: ubuntu-latest
     steps:
-      - name: Download .rpm artifact
-        uses: actions/download-artifact@v3
-        id: download
+      - name: Download RPM
+        uses: actions/download-artifact@v4
         with:
-          name: ${{ vars.PKG_NAME }}-${{ github.ref_name }}-1.${{ env.DIST }}.${{ env.ARCH }}.rpm
+          name: rpm-package
 
       - name: Convert .rpm to .deb
         run: |
+          sudo apt update
           sudo apt install -y alien
           sudo alien -k --verbose --to-deb *.rpm
 
-      - name: Upload .deb package as artifact
-        uses: actions/upload-artifact@v3
+      - name: Upload DEB
+        uses: actions/upload-artifact@v4
         with:
-          name: ${{ vars.PKG_NAME }}-${{ github.ref_name }}-1.${{ env.DIST }}.${{ env.ARCH }}.deb
+          name: deb-package
           path: ${{ vars.PKG_NAME }}*.deb
 
   release:
-    name: Create release with all assets
+    name: Release
     needs: [build_tarball, build_rpm, build_deb]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      - name: Download cached rpm, deb, and tar.gz artifacts
-        uses: actions/download-artifact@v3
-
-      - name: Release
-        uses: softprops/action-gh-release@v1
+      - name: Download tarball
+        uses: actions/download-artifact@v4
         with:
-          files: |
-            ${{ vars.PKG_NAME }}-${{ github.ref_name }}.tar.gz/*.tar.gz
-            ${{ vars.PKG_NAME }}-${{ github.ref_name }}-1.${{ env.DIST }}.${{ env.ARCH }}.rpm/**/*.rpm
-            ${{ vars.PKG_NAME }}-${{ github.ref_name }}-1.${{ env.DIST }}.${{ env.ARCH }}.deb/**/*.deb
+          name: source-archive
+          path: release-assets
+
+      - name: Download RPM
+        uses: actions/download-artifact@v4
+        with:
+          name: rpm-package
+          path: release-assets
+
+      - name: Download DEB
+        uses: actions/download-artifact@v4
+        with:
+          name: deb-package
+          path: release-assets
+
+      - name: Create GitHub Release
+        run: |
+          gh release create "${{ github.ref_name }}" \
+            --title "${{ github.ref_name }}" \
+            --notes "Automated release for version ${{ github.ref_name }}" \
+            release-assets/*
+
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
