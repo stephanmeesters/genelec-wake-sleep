@@ -1,0 +1,13 @@
+[Unit]
+Description=Genelec Sleep
+DefaultDependencies=no
+Before=shutdown.target
+Conflicts=reboot.target
+
+[Service]
+Type=oneshot
+ExecStart=genelec-cli sleep 
+TimeoutSec=3
+
+[Install]
+WantedBy=shutdown.target

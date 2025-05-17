@@ -1,0 +1,8 @@
+[Unit]
+Description=Genelec Wake
+
+[Service]
+ExecStart=genelec-cli wake
+
+[Install]
+WantedBy=multi-user.target
