@@ -32,9 +32,15 @@ jobs:
       - name: Build Release
         run: cargo build --release --target x86_64-unknown-linux-gnu
 
-      - name: Upload Release Binary
-        uses: actions/upload-artifact@v3
+      - name: Build RPM package
+        id: rpm
+        uses: naveenrajm7/rpmbuild@master
         with:
-          name: rust-linux-x64-binary
-          path: target/x86_64-unknown-linux-gnu/release/genelec-cli
+          spec_file: "genelec-cli.spec"
+
+      # - name: Upload Release Binary
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: rust-linux-x64-binary
+      #     path: target/x86_64-unknown-linux-gnu/release/genelec-cli
 
