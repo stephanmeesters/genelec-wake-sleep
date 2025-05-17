@@ -8,6 +8,8 @@ URL:            https://stephanmeesters.nl
 Source0:        %{name}-%{version}.tar.gz
 
 BuildRequires:  cargo
+BuildRequires:  hidapi-devel
+BuildRequires:  systemd-devel
 Requires:       systemd
 
 %description
