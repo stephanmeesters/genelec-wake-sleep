@@ -1,0 +1,40 @@
+name: Rust Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build (linux x64)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: x86_64-unknown-linux-gnu
+          default: true
+
+      - name: Install HIDAPI Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libhidapi-dev libudev-dev
+
+      - name: Build Release
+        run: cargo build --release --target x86_64-unknown-linux-gnu
+
+      - name: Upload Release Binary
+        uses: actions/upload-artifact@v3
+        with:
+          name: rust-linux-x64-binary
+          path: target/x86_64-unknown-linux-gnu/release/genelec-cli
+

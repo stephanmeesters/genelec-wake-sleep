@@ -1,0 +1,2 @@
+# HIDAPI/hidraw
+KERNEL=="hidraw*", ATTRS{idVendor}=="1781", ATTRS{idProduct}=="0e39", TAG+="uaccess"
