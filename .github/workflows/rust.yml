@@ -7,7 +7,7 @@ on:
 
 env:
   DIST: el7
-  ARCH: noarch
+  ARCH: x86_64
 
 jobs:
   build_tarball:
@@ -39,18 +39,6 @@ jobs:
 
       # - name: Replace version in RPM spec
       #   run: sed -Ei 's/(^Version:[[:space:]]*).*/\1${{ github.ref_name }}/' ${{ vars.PKG_NAME }}.spec
-      #
-      # - name: Setup Rust
-      #   uses: actions-rs/toolchain@v1
-      #   with:
-      #     toolchain: stable
-      #     target: x86_64-unknown-linux-gnu
-      #     default: true
-      #
-      # - name: Install HIDAPI Dependencies
-      #   run: |
-      #     sudo apt-get update
-      #     sudo apt-get install -y libhidapi-dev libudev-dev
 
       - name: Build RPM
         id: rpm
