@@ -23,7 +23,7 @@ rustup toolchain install stable-x86_64-unknown-linux-gnu && rustup run stable ca
 
 %install
 # Install binary
-install -D -m 0755 target/release/GenelecCli %{buildroot}%{_bindir}/GenelecCli
+install -D -m 0755 target/release/genelec-cli %{buildroot}%{_bindir}/genelec-cli
 
 # Install systemd services
 install -D -m 0644 systemd/genelec-sleep.service %{buildroot}%{_unitdir}/genelec-sleep.service
@@ -50,7 +50,7 @@ install -D -m 0644 udev/70-geneleccli-hid.rules %{buildroot}%{_udevrulesdir}/70-
 %files
 %license LICENSE
 %doc README.md
-%{_bindir}/GenelecCli
+%{_bindir}/genelec-cli
 %{_unitdir}/genelec-sleep.service
 %{_unitdir}/genelec-wake.service
 %{_udevrulesdir}/70-geneleccli-hid.rules
