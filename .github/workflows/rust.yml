@@ -81,6 +81,9 @@ jobs:
     permissions:
       contents: write
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Download tarball
         uses: actions/download-artifact@v4
         with:

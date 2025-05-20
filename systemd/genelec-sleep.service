@@ -6,7 +6,7 @@ Conflicts=reboot.target
 
 [Service]
 Type=oneshot
-ExecStart=GenelecCli sleep 
+ExecStart=genelec-cli sleep 
 TimeoutSec=3
 
 [Install]

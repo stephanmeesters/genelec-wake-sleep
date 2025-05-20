@@ -2,7 +2,7 @@
 Description=Genelec Wake
 
 [Service]
-ExecStart=GenelecCli wake
+ExecStart=genelec-cli wake
 
 [Install]
 WantedBy=multi-user.target
