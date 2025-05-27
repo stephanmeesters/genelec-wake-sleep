@@ -41,7 +41,7 @@ jobs:
 
       - name: Update spec version
         run: |
-          sed -i "s/^Version:.*$/Version:        ${VERSION}/" ${PKG_NAME}.spec
+          sed -i "s/^Version:.*$/Version:        ${VERSION}/" ${{ vars.PKG_NAME }}.spec
 
       - name: Build RPM
         id: rpm
