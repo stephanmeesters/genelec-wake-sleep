@@ -10,25 +10,8 @@ env:
   ARCH: x86_64
 
 jobs:
-  build_tarball:
-    name: Build source archive
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Create source archive
-        run: tar -czvf ${{ vars.PKG_NAME }}-${{ github.ref_name }}-sourcecode.tar.gz *
-
-      - name: Upload source archive
-        uses: actions/upload-artifact@v4
-        with:
-          name: source-archive
-          path: ${{ vars.PKG_NAME }}-${{ github.ref_name }}-sourcecode.tar.gz
-
   build_rpm:
     name: Build .rpm package
-    needs: build_tarball
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -48,6 +31,12 @@ jobs:
         uses: stephanmeesters/rpmbuild@master
         with:
           spec_file: ${{ vars.PKG_NAME }}.spec
+
+      - name: Rename RPM file
+        run: |
+          RPM_FILE=$(find rpmbuild/RPMS/ -name "*.rpm" | head -n1)
+          echo "Found RPM: $RPM_FILE"
+          mv "$RPM_FILE" "rpmbuild/RPMS/${{ vars.PKG_NAME }}-${{ env.VERSION }}-amd64.rpm"
 
       - name: Upload RPM
         uses: actions/upload-artifact@v4
@@ -71,6 +60,12 @@ jobs:
           sudo apt install -y alien
           sudo alien -k --verbose --to-deb *.rpm
 
+      - name: Rename DEB file
+        run: |
+          DEB_FILE=$(find . -name "*.deb" | head -n1)
+          echo "Found DEB: $DEB_FILE"
+          mv "$DEB_FILE" "${{ vars.PKG_NAME }}-${{ env.VERSION }}-amd64.deb"
+
       - name: Upload DEB
         uses: actions/upload-artifact@v4
         with:
@@ -79,7 +74,6 @@ jobs:
 
   build_windows:
     name: Build Windows packages
-    needs: build_tarball
     runs-on: windows-latest
     steps:
       - name: Checkout repository
@@ -109,19 +103,13 @@ jobs:
 
   release:
     name: Release
-    needs: [build_tarball, build_rpm, build_deb, build_windows]
+    needs: [build_rpm, build_deb, build_windows]
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Download tarball
-        uses: actions/download-artifact@v4
-        with:
-          name: source-archive
-          path: release-assets
 
       - name: Download RPM
         uses: actions/download-artifact@v4
