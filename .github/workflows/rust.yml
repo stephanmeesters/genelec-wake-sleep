@@ -34,6 +34,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Extract version from tag
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Update spec version
+        run: |
+          sed -i "s/^Version:.*$/Version:        ${VERSION}/" ${PKG_NAME}.spec
+
       - name: Build RPM
         id: rpm
         uses: stephanmeesters/rpmbuild@master
