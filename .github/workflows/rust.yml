@@ -24,7 +24,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: source-archive
-          path: ${{ vars.PKG_NAME }}-${{ github.ref_name }}.tar.gz
+          path: ${{ vars.PKG_NAME }}-${{ github.ref_name }}-sourcecode.tar.gz
 
   build_rpm:
     name: Build .rpm package
