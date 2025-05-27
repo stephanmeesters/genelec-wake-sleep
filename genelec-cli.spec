@@ -15,7 +15,7 @@ Requires:       systemd
 %define debug_package %{nil}
 
 %description
-Small Rust application to manage Genelec speaker power states via systemd and udev.
+Manage your Genelec speakers over CLI.
 
 %prep
 %autosetup
@@ -56,8 +56,3 @@ install -D -m 0644 udev/70-geneleccli-hid.rules %{buildroot}%{_udevrulesdir}/70-
 %{_unitdir}/genelec-sleep.service
 %{_unitdir}/genelec-wake.service
 %{_udevrulesdir}/70-geneleccli-hid.rules
-
-%changelog
-* Sat May 17 2025 Stephan Meesters <stephan.meesters@gmail.com> - 1.0-1
-- Initial package
-
