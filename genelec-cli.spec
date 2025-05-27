@@ -12,6 +12,8 @@ BuildRequires:  hidapi-devel
 BuildRequires:  systemd-devel
 Requires:       systemd
 
+%define debug_package %{nil}
+
 %description
 Small Rust application to manage Genelec speaker power states via systemd and udev.
 

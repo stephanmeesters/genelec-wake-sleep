@@ -1,9 +1,9 @@
-name: Build Linux Packages
+name: Build Linux and Windows Packages
 
 on:
   push:
-    branches:
-      - workflow-test
+    tags:
+      - 'v*.*.*'
 
 env:
   DIST: el7
@@ -16,9 +16,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      # - name: Replace version in RPM spec
-      #   run: sed -Ei 's/(^Version:[[:space:]]*).*/\1${{ github.ref_name }}/' ${{ vars.PKG_NAME }}.spec
 
       - name: Create source archive
         run: tar -czvf ${{ vars.PKG_NAME }}-${{ github.ref_name }}.tar.gz *
@@ -36,9 +33,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      # - name: Replace version in RPM spec
-      #   run: sed -Ei 's/(^Version:[[:space:]]*).*/\1${{ github.ref_name }}/' ${{ vars.PKG_NAME }}.spec
 
       - name: Build RPM
         id: rpm
@@ -74,9 +68,39 @@ jobs:
           name: deb-package
           path: ${{ vars.PKG_NAME }}*.deb
 
+  build_windows:
+    name: Build Windows packages
+    needs: build_tarball
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        run: |
+          rustup toolchain install stable
+          rustup target add x86_64-pc-windows-msvc aarch64-pc-windows-msvc
+
+      - name: Build Windows x86_64
+        run: |
+          cargo build --release --target x86_64-pc-windows-msvc
+          mkdir output
+          cp target/x86_64-pc-windows-msvc/release/*.exe output/${{ vars.PKG_NAME }}-win-x86_64.exe
+
+      - name: Build Windows ARM64
+        run: |
+          cargo build --release --target aarch64-pc-windows-msvc
+          cp target/aarch64-pc-windows-msvc/release/*.exe output/${{ vars.PKG_NAME }}-win-arm64.exe
+
+      - name: Upload Windows packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-package
+          path: output/*.exe
+
   release:
     name: Release
-    needs: [build_tarball, build_rpm, build_deb]
+    needs: [build_tarball, build_rpm, build_deb, build_windows]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -102,13 +126,18 @@ jobs:
           name: deb-package
           path: release-assets
 
+      - name: Download Windows package
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-package
+          path: release-assets
+
       - name: Create GitHub Release
         run: |
           gh release create "${{ github.ref_name }}" \
             --title "${{ github.ref_name }}" \
             --notes "Automated release for version ${{ github.ref_name }}" \
             release-assets/*
-
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
