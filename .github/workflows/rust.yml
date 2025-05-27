@@ -36,13 +36,13 @@ jobs:
         run: |
           RPM_FILE=$(find rpmbuild/RPMS/ -name "*.rpm" | head -n1)
           echo "Found RPM: $RPM_FILE"
-          mv "$RPM_FILE" "rpmbuild/RPMS/${{ vars.PKG_NAME }}-${{ env.VERSION }}-amd64.rpm"
+          cp "$RPM_FILE" "${{ vars.PKG_NAME }}-${{ env.VERSION }}-amd64.rpm"
 
       - name: Upload RPM
         uses: actions/upload-artifact@v4
         with:
           name: rpm-package
-          path: rpmbuild/RPMS/${{ env.ARCH }}/*.rpm
+          path: ${{ vars.PKG_NAME }}*.rpm
 
   build_deb:
     name: Build .deb package
