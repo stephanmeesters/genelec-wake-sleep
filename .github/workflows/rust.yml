@@ -36,7 +36,7 @@ jobs:
         run: |
           RPM_FILE=$(find rpmbuild/RPMS/ -name "*.rpm" | head -n1)
           echo "Found RPM: $RPM_FILE"
-          cp "$RPM_FILE" "${{ vars.PKG_NAME }}-${{ env.VERSION }}-amd64.rpm"
+          cp "$RPM_FILE" "${{ vars.PKG_NAME }}-${{ github.ref_name }}-amd64.rpm"
 
       - name: Upload RPM
         uses: actions/upload-artifact@v4
@@ -64,7 +64,7 @@ jobs:
         run: |
           DEB_FILE=$(find . -name "*.deb" | head -n1)
           echo "Found DEB: $DEB_FILE"
-          mv "$DEB_FILE" "${{ vars.PKG_NAME }}-${{ env.VERSION }}-amd64.deb"
+          mv "$DEB_FILE" "${{ vars.PKG_NAME }}-${{ github.ref_name }}-amd64.deb"
 
       - name: Upload DEB
         uses: actions/upload-artifact@v4
@@ -88,12 +88,12 @@ jobs:
         run: |
           cargo build --release --target x86_64-pc-windows-msvc
           mkdir output
-          cp target/x86_64-pc-windows-msvc/release/*.exe output/${{ vars.PKG_NAME }}-win-x86_64.exe
+          cp target/x86_64-pc-windows-msvc/release/*.exe output/${{ vars.PKG_NAME }}-${{ github.ref_name }}-win-x86_64.exe
 
       - name: Build Windows ARM64
         run: |
           cargo build --release --target aarch64-pc-windows-msvc
-          cp target/aarch64-pc-windows-msvc/release/*.exe output/${{ vars.PKG_NAME }}-win-arm64.exe
+          cp target/aarch64-pc-windows-msvc/release/*.exe output/${{ vars.PKG_NAME }}-${{ github.ref_name }}-win-arm64.exe
 
       - name: Upload Windows packages
         uses: actions/upload-artifact@v4
